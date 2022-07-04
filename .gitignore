@@ -3,3 +3,6 @@ go.sum
 
 # Environments
 .env
+
+# Data mount 
+/data
