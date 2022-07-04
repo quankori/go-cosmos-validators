@@ -1,0 +1,63 @@
+version: '3.7'
+
+# Environment variables for rest-api
+x-rest-api-env: &rest-api-env # Prefix
+  NETWORK_RPC: N/A
+  KEY_MNENONICE_1: N/A
+  PREFIX: archway
+  APP_PORT: 3005
+  MONGO_URI: N/A
+  NODE_ENV: N/A
+
+x-contract-env: &contract-env # Contract
+  STAKING_CONTRACT: N/A
+  CW20_BASE_CONTRACT: N/A
+  SWAP_CONTRACT: N/A
+
+services:
+  #######
+  # Certbot
+  #######
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: certbot
+  #   volumes: 
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   command: certonly --webroot -w /var/www/certbot --force-renewal --email quan.nguyen@canlab.vn -d liquidstaking.techiast.com --agree-tos
+  #######
+  # Proxy
+  #######
+  web:
+    build: ./nginx
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/
+      # - ./certbot/conf:/etc/letsencrypt
+      # - ./certbot/www:/var/www/certbot
+    ports:
+      - '80:80'
+    depends_on:
+      - node
+    networks:
+      - app-network
+
+  ###########
+  # APIs
+  ###########
+  node:
+    build:
+      context: .
+      target: production
+    restart: on-failure
+    ports:
+      - '3005:3005'
+    networks:
+      - app-network
+    environment:
+      <<: *rest-api-env
+      <<: *contract-env
+
+networks:
+  app-network:
+    driver: bridge
+Footer
