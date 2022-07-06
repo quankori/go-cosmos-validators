@@ -26,18 +26,10 @@ func PushMessage(key string, value string) error {
 	return nil
 }
 
-func GetMessage(key string) chan string {
-	r := make(chan string)
-	go func() {
-		for {
-			redisClient := redisClient()
-			result, err := redisClient.BLPop(0*time.Second, key).Result()
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
-				r <- result[1]
-			}
-		}
-	}()
-	return r
+func GetMessage(key string) []string {
+	redisClient := redisClient()
+	result, _ := redisClient.BLPop(0*time.Second, key).Result()
+	fmt.Println(result)
+
+	return result
 }
